@@ -1,1 +1,36 @@
+name: Tushare Monitor & WeChat Push
+
+on:
+  schedule:
+    # 每天北京时间 18:00（UTC+8）运行
+    # 18:00 - 8 = 10:00 UTC
+    - cron: '0 10 * * *'
+  workflow_dispatch:  # 手动触发（用来测试）
+
+jobs:
+  run-monitor:
+    runs-on: ubuntu-latest
+
+    env:
+      # 从 GitHub Secrets 注入环境变量
+      TUSHARE_TOKEN: ${{ secrets.TUSHARE_TOKEN }}
+      SERVERCHAN_SENDKEY: ${{ secrets.SERVERCHAN_SENDKEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run monitoring script
+        run: |
+          python main.py
 
